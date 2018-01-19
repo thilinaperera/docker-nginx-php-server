@@ -1,5 +1,12 @@
 FROM debian:stretch
-# https://github.com/wyveo/nginx-php-fpm
+
+# Credits
+# Project: https://github.com/wyveo/nginx-php-fpm
+# Author: Colin Wilson
+# License: https://raw.githubusercontent.com/wyveo/nginx-php-fpm/master/LICENSE
+
+MAINTAINER Thilina Perera "thilina@thilina.lk"
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV NGINX_VERSION 1.13.7-1~stretch
 ENV php_conf /etc/php/7.2/fpm/php.ini
