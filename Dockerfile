@@ -73,6 +73,9 @@ ADD ./configs/supervisord.conf /etc/supervisord.conf
 # Override nginx's default config
 ADD ./configs/default.conf /etc/nginx/conf.d/default.conf
 
+# Override PHP's default config
+ADD ./configs/php.ini /etc/php/7.2/fpm/php.ini
+
 USER root
 # Add Scripts
 RUN mkdir -p /var/run/php
