@@ -49,8 +49,11 @@ RUN apt-get update \
     && pip install wheel \
     && pip install supervisor supervisor-stdout \
     && echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d \
-    && rm -rf /etc/nginx/conf.d/default.conf \
-    && sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" ${php_conf} \
+    && rm -rf /etc/nginx/conf.d/default.conf
+
+# Override PHP's default config
+ADD ./configs/php.ini /etc/php/7.2/fpm/php.ini
+RUN sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" ${php_conf} \
     && sed -i -e "s/memory_limit\s*=\s*.*/memory_limit = 256M/g" ${php_conf} \
     && sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
     && sed -i -e "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
@@ -73,8 +76,6 @@ ADD ./configs/supervisord.conf /etc/supervisord.conf
 # Override nginx's default config
 ADD ./configs/default.conf /etc/nginx/conf.d/default.conf
 
-# Override PHP's default config
-ADD ./configs/php.ini /etc/php/7.2/fpm/php.ini
 
 USER root
 # Add Scripts
