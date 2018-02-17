@@ -11,6 +11,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV NGINX_VERSION 1.13.7-1~stretch
 ENV php_conf /etc/php/7.2/fpm/php.ini
 ENV fpm_conf /etc/php/7.2/fpm/pool.d/www.conf
+ENV nginx_conf /etc/nginx/nginx.conf
 
 RUN apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -q -y gnupg2 dirmngr wget apt-transport-https lsb-release ca-certificates \
@@ -53,6 +54,9 @@ RUN apt-get update \
 
 # Override PHP's default config
 ADD ./configs/php.ini /etc/php/7.2/fpm/php.ini
+
+# Override NGiNX's default config
+ADD ./configs/nginx.conf /etc/nginx/nginx.conf
 RUN sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" ${php_conf} \
     && sed -i -e "s/memory_limit\s*=\s*.*/memory_limit = 256M/g" ${php_conf} \
     && sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
@@ -67,19 +71,24 @@ RUN sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" ${php_conf} \
     && sed -i -e "s/pm.max_requests = 500/pm.max_requests = 200/g" ${fpm_conf} \
     && sed -i -e "s/www-data/nginx/g" ${fpm_conf} \
     && sed -i -e "s/^;clear_env = no$/clear_env = no/" ${fpm_conf} \
+    && sed -i -e "s/unix:upstream/unix:\/run\/php\/php7.2-fpm.sock/g" ${nginx_conf} \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 # Supervisor config
 ADD ./configs/supervisord.conf /etc/supervisord.conf
 
-# Override nginx's default config
-ADD ./configs/default.conf /etc/nginx/conf.d/default.conf
-
-
 USER root
 # Add Scripts
 RUN mkdir -p /var/run/php
+RUN mkdir -p /etc/nginx/custom-sites
+RUN mkdir -p /etc/nginx/upstream
+RUN mkdir -p /etc/nginx/common-configs
+
+COPY ./configs/upstream /etc/nginx/upstream/
+COPY ./configs/common-configs /etc/nginx/common-configs/
+COPY ./configs/custom-sites /etc/nginx/custom-sites/
+
 
 ADD ./start.sh /start.sh
 RUN chmod +x /start.sh
