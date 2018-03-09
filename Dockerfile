@@ -22,6 +22,7 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -q -y \
             apt-utils \
+            logrotate \
             curl \
             nano \
             zip \
