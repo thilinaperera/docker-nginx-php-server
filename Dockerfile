@@ -48,6 +48,7 @@ RUN apt-get update \
             php7.2-intl \
             php7.2-xml \
             php7.2-redis \
+            php7.2-gd \
     && pip install wheel \
     && pip install supervisor supervisor-stdout \
     && echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d \
